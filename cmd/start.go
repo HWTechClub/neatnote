@@ -1,3 +1,18 @@
+// Neat Note. A notes sharing platform for university students.
+// Copyright (C) 2020 Humaid AlQassimi
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 package cmd
 
 import (
@@ -10,11 +25,13 @@ import (
 	"github.com/go-macaron/csrf"
 	"github.com/go-macaron/session"
 	_ "github.com/go-macaron/session/mysql" // MySQL driver for persistent sessions
+	"github.com/hako/durafmt"
 	"github.com/urfave/cli/v2"
 	macaron "gopkg.in/macaron.v1"
 	"html/template"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -38,6 +55,16 @@ func start(clx *cli.Context) (err error) {
 		Funcs: []template.FuncMap{map[string]interface{}{
 			"CalcTime": func(sTime time.Time) string {
 				return fmt.Sprint(time.Since(sTime).Nanoseconds() / int64(time.Millisecond))
+			},
+			"EmailToUser": func(s string) string {
+				if strings.Contains(s, "@") {
+					return strings.Split(s, "@")[0]
+				} else {
+					return s
+				}
+			},
+			"CalcDurationShort": func(unix int64) string {
+				return durafmt.Parse(time.Now().Sub(time.Unix(unix, 0))).LimitFirstN(1).String()
 			},
 		}},
 		IndentJSON: true,
@@ -88,9 +115,12 @@ func start(clx *cli.Context) (err error) {
 	m.Post("/cancel", csrf.Validate, routes.CancelHandler)
 	m.Get("/logout", routes.RequireLogin, routes.LogoutHandler)
 
-	m.Group("/admin", func() {
-		m.Get("/add_course", routes.AdminAddCourseHandler)
-		m.Post("/add_course", csrf.Validate, routes.AdminPostAddCourseHandler)
+	m.Group("/a", func() {
+		m.Get("/", routes.AdminHandler)
+		m.Post("/", csrf.Validate, routes.PostAdminHandler)
+		m.Get("/view/:user", routes.AdminViewUserHandler)
+		m.Get("/addcourse", routes.AdminAddCourseHandler)
+		m.Post("/addcourse", csrf.Validate, routes.AdminPostAddCourseHandler)
 	}, routes.RequireLogin, routes.RequireAdmin)
 
 	m.Group("/c/:course", func() {
@@ -102,6 +132,7 @@ func start(clx *cli.Context) (err error) {
 			csrf.Validate, routes.PostCreatePostHandler)
 		m.Group("/:post", func() {
 			m.Get("/", routes.PostPageHandler)
+			m.Get("/lite", routes.LitePostHandler)
 			m.Post("/", csrf.Validate, routes.PostCommentPostHandler)
 			m.Get("/upvote", routes.RequireLogin, routes.PostUnlocked,
 				routes.UpvotePostHandler)

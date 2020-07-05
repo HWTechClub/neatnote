@@ -1,13 +1,26 @@
+// Neat Note. A notes sharing platform for university students.
+// Copyright (C) 2020 Humaid AlQassimi
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 package models
 
 import (
 	"fmt"
 	"git.sr.ht/~humaid/neatnote/modules/settings"
 	_ "github.com/go-sql-driver/mysql" // MySQL driver support
-	"github.com/hako/durafmt"
-	_ "github.com/mattn/go-sqlite3" // SQLite driver support
+	_ "github.com/mattn/go-sqlite3"    // SQLite driver support
 	"log"
-	"time"
 	"xorm.io/core"
 	"xorm.io/xorm"
 )
@@ -24,12 +37,6 @@ func init() {
 		new(Post),
 		new(Comment),
 	)
-}
-
-// calcDuration calculates the duration between two timestamps.
-// It will return a fancy formatted duration in text.
-func calcDuration(unix int64) string {
-	return durafmt.Parse(time.Now().Sub(time.Unix(unix, 0))).LimitFirstN(1).String()
 }
 
 // SetupEngine sets up an XORM engine according to the database configuration
@@ -55,8 +62,8 @@ func SetupEngine() *xorm.Engine {
 	engine.SetMapper(core.GonicMapper{}) // So ID becomes 'id' instead of 'i_d'
 	err = engine.Sync(tables...)         // Sync the schema of tables
 
-	//cacher := xorm.NewLRUCacher(xorm.NewMemoryStore(), 1000)
-	//engine.SetDefaultCacher(cacher)
+	cacher := xorm.NewLRUCacher(xorm.NewMemoryStore(), 2000)
+	engine.SetDefaultCacher(cacher)
 
 	if err != nil {
 		log.Fatal("Unable to sync schema! ", err)

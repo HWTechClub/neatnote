@@ -1,0 +1,28 @@
+{{template "base/head" .}}
+<div class="content">
+	{{template "partials/flash" .}}
+	<p><a href="/a">&lt; Go back</a></p>
+	<h2>{{if .VUser.FullName}}{{.VUser.FullName}}
+		<span class="muted-text">({{.VUser.Username}})</span>{{else}}{{.VUser.Username}}{{end}}'s information</h2>
+	<dl>
+		<dt>Username</dt>
+		<dd>{{.VUser.Username}}</dd>
+		<dt>Display Name</dt>
+		<dd>{{if .VUser.FullName}}{{.VUser.FullName}}{{else}}
+		<i class="muted-text">None</i>{{end}}</dd>
+		<dt>Badge</dt>
+		<dd>{{if .VUser.Badge}}{{.VUser.Badge}}{{else}}<i class="muted-text">None</i>{{end}}</dd>
+		<dt>Iota</dt>
+		<dd>{{.VUser.Iota}}</dd>
+		<dt>Created <span class="muted-text">(first login)</span></dt>
+		<dd>{{CalcDurationShort .VUser.CreatedUnix}} ago</dd>
+		<dt>Is Admin?</dt>
+		<dd>{{.VUser.IsAdmin}}</dd>
+		<dt>Is Suspended?</dt>
+		<dd>{{.VUser.Suspended}}</dd>
+		{{if .VUser.SuspendReason}}<dt>Suspended Reason</dt>
+		<dd>{{.VUser.SuspendReason}}</dd>{{end}}
+	</dl>
+</div>
+{{template "base/footer" .}}
+

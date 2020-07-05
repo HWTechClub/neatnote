@@ -3,19 +3,20 @@
 	{{template "partials/flash" .}}
 	<h2>Add course</h2>
 	<form method="post">
-		<div>
-			<label for="coursecode">Course Code:</label>
-			<input type="text" id="coursecode" name="coursecode" required="1"
-			autofocus="1">
+		<div class="col-4">
+			<div class="form-group">
+				<label class="item-title" for="coursecode">Course Code</label>
+				<input class="form-item" type="text" id="coursecode" name="coursecode" required="1"
+				autofocus="1">
+			</div>
+			<div class="form-group">
+				<label class="item-title" for="coursename">Course Name</label>
+				<input class="form-item" type="text" id="coursename" name="coursename" required="1">
+			</div>
 		</div>
-		<br />
-		<div>
-			<label for="coursename">Course Name:</label>
-			<input type="text" id="coursename" name="coursename" required="1">
-		</div>
-		<br />
 		<input type="hidden" name="_csrf" value="{{.csrf_token}}">
-		<button type="submit" class="btn">Add course</button>
+		<p><button type="submit" class="btn">Add course</button>
+		<a href="/a" class="btn btn-danger">Abort</a></p>
 	</form>
 
 </div>

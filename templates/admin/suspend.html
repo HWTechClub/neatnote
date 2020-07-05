@@ -1,0 +1,27 @@
+{{template "base/head" .}}
+<div class="content">
+	{{template "partials/flash" .}}
+	<h2>Suspend user</h2>
+	<p>You are willing to suspend {{if .BadUser.FullName}}{{.BadUser.FullName}}
+	({{.BadUser.Username}}){{else}}{{.BadUser.Username}}{{end}}.</p>
+	
+	<form method="post">
+		<div class="col-4">
+			<div class="form-group">
+				<label class="item-title" for="reason">Suspension Reason</label>
+				<input class="form-item" type="text" id="reason" name="reason"
+				required="1" autofocus="1">
+			</div>
+		</div>
+		<input type="hidden" name="_csrf" value="{{.csrf_token}}" />
+		<input type="hidden" name="action" value="suspend" />
+		<input type="hidden" name="username" value="{{.BadUser.Username}}" />
+		<p><small>The user will be suspended indefinitely until an admin
+			unsuspends the user.</small></p>
+		<p><button type="submit" class="btn btn-danger">Suspend</button>
+		<a href="/a" class="btn">Abort</a></p>
+	</form>
+
+</div>
+{{template "base/footer" .}}
+

@@ -3,20 +3,23 @@
 	{{template "partials/flash" .}}
 	<h2>Edit your post</h2>
 	<form method="post">
-		<div>
-			<label for="title">Title:</label>
-			<input type="text" id="title" name="title" required="1"
-			autofocus="1" value="{{if .ptitle}}{{.ptitle}}{{else}}{{.Post.Title}}{{end}}">
+		<div class="col-10">
+			<div class="form-group">
+				<label for="title">Title</label>
+				<input class="form-item" type="text" id="title" name="title" required="1"
+				value="{{if .ptitle}}{{.ptitle}}{{else}}{{.Post.Title}}{{end}}" />
+			</div>
+			<div class="form-group">
+				<label for="text">Body</label>
+				<textarea class="form-item" id="text" name="text" cols="70" rows="20" required="1">{{if .ptext}}{{.ptext}}{{else}}{{.Post.Text}}{{end}}</textarea> 
+				<p class="muted-text">Markdown, HTML, and LaTeX Math is supported.</p>
+			</div>
 		</div>
-		<br />
-		<div>
-			 <textarea name="text" cols="70" rows="20" required="1">{{if .ptext}}{{.ptext}}{{else}}{{.Post.Text}}{{end}}</textarea> 
-		</div>
-		<br />
 		<input type="hidden" name="_csrf" value="{{.csrf_token}}">
 		<p><button type="submit" class="btn">Submit changes</button>
 		<a class="btn btn-danger" href="/c/{{.Post.CourseCode}}">Discard
 		changes</a></p>
+		</div>
 	</form>
 
 </div>

@@ -1,3 +1,18 @@
+// Neat Note. A notes sharing platform for university students.
+// Copyright (C) 2020 Humaid AlQassimi
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 package routes
 
 import (
@@ -35,6 +50,10 @@ func LoginHandler(ctx *macaron.Context, x csrf.CSRF, sess session.Store, f *sess
 	ctx.HTML(200, "login")
 }
 
+func randIntRange(min, max int) int {
+	return rand.Intn(max-min) + min
+}
+
 // PostLoginHandler post response for login page.
 func PostLoginHandler(ctx *macaron.Context, sess session.Store, f *session.Flash) {
 	if sess.Get("auth") == Verification {
@@ -47,7 +66,7 @@ func PostLoginHandler(ctx *macaron.Context, sess session.Store, f *session.Flash
 		return
 	}
 	// Generate code
-	code := fmt.Sprint(rand.Intn(8999) + 1000)
+	code := fmt.Sprint(randIntRange(100000, 999999))
 	to := fmt.Sprintf("%s%s", strings.ToLower(ctx.QueryTrim("email")), settings.Config.UniEmailDomain)
 	err := checkmail.ValidateFormat(to)
 	if err != nil {
@@ -62,6 +81,7 @@ func PostLoginHandler(ctx *macaron.Context, sess session.Store, f *session.Flash
 	sess.Set("auth", Verification)
 	sess.Set("code", code)
 	sess.Set("user", to)
+	sess.Set("attempts", 0)
 	ctx.Redirect("/verify")
 }
 
@@ -78,7 +98,7 @@ func VerifyHandler(ctx *macaron.Context, x csrf.CSRF, sess session.Store, f *ses
 	ctx.Data["csrf_token"] = x.GetToken()
 	ctx.Data["email"] = sess.Get("user")
 	ctx.Data["Title"] = "Verification"
-	ctx.HTML(200, "validate_login")
+	ctx.HTML(200, "verify_login")
 }
 
 // CancelHandler post response for canceling verification.
@@ -98,6 +118,13 @@ func PostVerifyHandler(ctx *macaron.Context, sess session.Store, f *session.Flas
 		ctx.Redirect("/login")
 		return
 	} else if sess.Get("auth") == LoggedIn {
+		ctx.Redirect("/")
+		return
+	}
+	sess.Set("attempts", sess.Get("attempts").(int)+1)
+	if sess.Get("attempts").(int) > 3 {
+		f.Error("You reached the maximum number of attempts. Please try again later.")
+		sess.Set("auth", LoggedOut)
 		ctx.Redirect("/")
 		return
 	}

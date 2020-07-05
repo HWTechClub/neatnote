@@ -10,14 +10,15 @@
 	{{template "partials/flash" .}}
 	<h2>Login</h2>
 	<form method="post">
-		<div>
-			<label for="email">Email:</label>
-			<input type="text" id="email" name="email" required="1" size="8"
-			autofocus="1">{{.UniEmailDomain}}
+		<div class="col-5">
+			<div class="form-group">
+				<label for="email">Email:</label>
+				<input type="text" id="email" name="email" required="1" size="8"
+				autofocus="1">{{.UniEmailDomain}}
+			</div>
+			<input type="hidden" name="_csrf" value="{{.csrf_token}}">
+			<button type="submit" class="btn">Continue →</button>
 		</div>
-		<br />
-		<input type="hidden" name="_csrf" value="{{.csrf_token}}">
-		<button type="submit" class="btn">Continue →</button>
 	</form>
 
 </div>

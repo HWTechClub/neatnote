@@ -1,3 +1,18 @@
+// Neat Note. A notes sharing platform for university students.
+// Copyright (C) 2020 Humaid AlQassimi
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 package models
 
 import (
@@ -13,10 +28,9 @@ type Course struct {
 	Name        string `xorm:"notnull text"`
 	Visible     bool   `xorm:"notnull"`
 	Locked      bool   `xorm:"notnull"`
-	PostsCount  int64  `xorm:"-"`
-	Posts       []Post `xorm:"-"`
+	PostsCount  int64  `xorm:"-" json:"-"`
+	Posts       []Post `xorm:"-" json:"-"`
 	CreatedUnix int64  `xorm:"created"`
-	Created     string `xorm:"-"`
 	UpdatedUnix int64  `xorm:"updated"`
 }
 
@@ -49,7 +63,6 @@ func GetCourse(code string) (*Course, error) {
 	} else if !has {
 		return c, errors.New("Course does not exist")
 	}
-	c.Created = calcDuration(c.CreatedUnix)
 	return c, nil
 }
 
@@ -61,7 +74,6 @@ func (c *Course) LoadPosts() (err error) {
 	}
 	for i := range c.Posts {
 		c.Posts[i].Poster, _ = GetUser(c.Posts[i].PosterID)
-		c.Posts[i].Created = calcDuration(c.Posts[i].CreatedUnix)
 		c.Posts[i].CommentsCount, _ = engine.Where("post_id = ?", c.Posts[i].PostID).Count(new(Comment))
 	}
 	return

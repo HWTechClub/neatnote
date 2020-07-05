@@ -4,31 +4,32 @@
 	<h2>{{.Post.Title}}</h2>
 	<p><small class="sgrey">{{.Post.Iota}}&iota; by {{.Poster}}
 	{{if .Post.Anonymous}}<span class="badge" style="font-weight:bold;">Anon</span>
-	{{else if .Post.Poster.Badge}}<span class="badge">{{.Post.Poster.Badge}}</span> {{end}}{{.Post.Created}} ago
+	{{else if .Post.Poster.Badge}}<span class="badge">{{.Post.Poster.Badge}}</span> {{end}}{{CalcDurationShort .Post.CreatedUnix}} ago
 	{{if not .Locked}}<a href="/c/{{.Post.CourseCode}}/{{.Post.PostID}}/upvote">
 	{{if .Upvoted}}[unvote]{{else}}[upvote]{{end}}</a>{{end}}{{if .LoggedIn}}{{if and .User.IsAdmin .Post.Anonymous}}
 	<a href="/c/{{.Post.CourseCode}}/{{.Post.PostID}}/reveal">[reveal]</a>{{end}}
 	{{if or .User.IsAdmin (eq .Post.PosterID .User.Username)}}<a href="/c/{{.Post.CourseCode}}/{{.Post.PostID}}/edit">
 	[edit]</a>{{end}}{{end}}
 	{{if .User.IsAdmin}}<a href="/c/{{.Post.CourseCode}}/{{.Post.PostID}}/del">[delete]</a>{{end}}
-	</small></p>
+	<a href="/c/{{.Post.CourseCode}}/{{.Post.PostID}}/lite">[lite/print]</a></small></p>
 	<div class="post">{{.FormattedPost}}</div>
 	{{if not .Locked}}<form method="post">
-		<div>
-			<textarea name="text" cols="40" rows="4" required="1" {{if not .LoggedIn}} disabled="1"{{end}}
+		<div class="col-5">
+		<div class="form-group">
+			<textarea class="form-item" name="text" cols="40" rows="4" required="1" {{if not .LoggedIn}} disabled="1"{{end}}
 			placeholder="Markdown, HTML, and LaTeX Math supported">{{if not .LoggedIn}}Login to comment.{{else if $.ctext}}{{$.ctext}}{{end}}</textarea> 
 		</div>
-		<br>
 		<input type="hidden" name="_csrf" value="{{.csrf_token}}">
 		<button type="submit" class="btn"{{if not .LoggedIn}} disabled="1"{{end}}>Comment</button>
+		</div>
 	</form>
 	<br>{{end}}
 	{{range .Post.Comments}}
 	<div class="comment"><p id="c-{{.CommentID}}"><small class="sgrey">
 	{{if eq $.Post.PosterID .Poster.Username}}{{$.Poster}}{{else}}
-	{{if .Poster.FullName}}{{.Poster.FullName}}{{else}}{{.Poster.Username}}{{end}}{{end}}
+	{{if .Poster.FullName}}{{.Poster.FullName}}{{else}}{{EmailToUser .Poster.Username}}{{end}}{{end}}
 	{{if and $.Post.Anonymous (eq $.Post.PosterID .PosterID)}}<span class="badge" style="font-weight:bold;">Anon</span>
-	{{else if .Poster.Badge}}<span class="badge">{{.Poster.Badge}}</span> {{end}}{{.Created}} ago
+	{{else if .Poster.Badge}}<span class="badge">{{.Poster.Badge}}</span> {{end}}{{CalcDurationShort .CreatedUnix}} ago
 	{{if and $.LoggedIn $.User.IsAdmin}}<a href="/c/{{$.Post.CourseCode}}/{{$.Post.PostID}}/del/{{.CommentID}}">[delete]</a>{{end}}
 	{{if $.LoggedIn}}{{if or $.User.IsAdmin (eq $.User.Username .Poster.Username)}}<a href="/c/{{$.Post.CourseCode}}/{{$.Post.PostID}}/edit/{{.CommentID}}">[edit]</a>{{end}}{{end}}
 	</small></p>

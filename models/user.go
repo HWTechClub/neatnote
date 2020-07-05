@@ -1,3 +1,18 @@
+// Neat Note. A notes sharing platform for university students.
+// Copyright (C) 2020 Humaid AlQassimi
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 package models
 
 import (
@@ -13,7 +28,6 @@ type User struct {
 	Badge         string `xorm:"text null"`
 	IsAdmin       bool   `xorm:"bool"`
 	Iota          int64
-	Created       string  `xorm:"-"`
 	CreatedUnix   int64   `xorm:"created"`
 	Upvoted       []int64 // Post IDs which the user upvoted.
 	Suspended     bool    `xorm:"notnull"`
@@ -29,9 +43,14 @@ func GetUser(user string) (*User, error) {
 	} else if !has {
 		return u, errors.New("User does not exist")
 	}
-	u.Created = calcDuration(u.CreatedUnix)
 	u.Iota, _ = engine.Where("poster_id = ?", u.Username).SumInt(new(Post), "iota")
 	return u, nil
+}
+
+// GetUsers returns a list of all users in the database.
+func GetUsers() (users []User) {
+	engine.Find(&users)
+	return users
 }
 
 // AddUser adds a new User to the database.
@@ -52,15 +71,9 @@ func UpdateUser(u *User) (err error) {
 	return
 }
 
-// UpdateUserAdmin updates a user in the database including the IsAdmin field.
-func UpdateUserAdmin(u *User) (err error) {
-	_, err = engine.Id(u.Username).Cols("is_admin").Update(u)
-	return
-}
-
-// UpdateUserBadge updates a user in the database including the Badge field,
-// even if the field is empty.
-func UpdateUserBadge(u *User) (err error) {
-	_, err = engine.Id(u.Username).Cols("badge").Update(u)
-	return
+// UpdatUserCols updates a user in the database including the specified
+// columns, even if the fields are empty.
+func UpdateUserCols(u *User, cols ...string) error {
+	_, err := engine.Id(u.Username).Cols(cols...).Update(u)
+	return err
 }

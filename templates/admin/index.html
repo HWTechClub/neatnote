@@ -1,0 +1,33 @@
+{{template "base/head" .}}
+<div class="content">
+	{{template "partials/flash" .}}
+	<h2>Admin Dashboard</h2>
+	<h3>Registered Users</h3>
+	<ul>
+	{{range .Users}}
+	<li>{{if not .FullName}}{{.Username}}{{else}}{{.FullName}}
+		<span class="muted-text">({{.Username}})</span>{{end}}
+		{{if .Badge}}<span class="badge">{{.Badge}}</span>{{end}}
+		<form method="post" style="display:inline;">
+		<input type="hidden" name="_csrf" value="{{$.csrf_token}}" />
+		<input type="hidden" name="action" value="{{if .Suspended}}unsuspend{{else}}suspend_prompt{{end}}" />
+		<input type="hidden" name="username" value="{{.Username}}" />
+			<button type="submit" class="btn">{{if .Suspended}}unsuspend{{else}}suspend{{end}}</button>
+		</form> <a href="/a/view/{{.Username}}" class="btn">view info</a></li>
+	{{end}}
+	</ul>
+	<h3>Courses</h3>
+	<p><a class="btn" href="/a/addcourse">Add course</a></p>
+	<h3>Instance Statistics</h3>
+	<h4>System</h4>
+	<dl>
+		<dt>Go Version</dt>
+		<dd>{{.Goversion}}</dd>
+		<dt>Uptime</dt>
+		<dd>{{.Uptime}}</dd>
+		<dt>Goroutines</dt>
+		<dd>{{.Goroutines}}</dd>
+	</dl>
+</div>
+{{template "base/footer" .}}
+

@@ -1,10 +1,23 @@
+// Neat Note. A notes sharing platform for university students.
+// Copyright (C) 2020 Humaid AlQassimi
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 package models
 
 import (
 	"errors"
-	"github.com/hako/durafmt"
 	"html/template"
-	"time"
 )
 
 // Comment represents a comment on a Post. It keeps track of the poster and
@@ -13,11 +26,10 @@ type Comment struct {
 	CommentID     int64         `xorm:"pk autoincr"`
 	PostID        int64         `xorm:"notnull"`
 	PosterID      string        `xorm:"notnull"`
-	Poster        *User         `xorm:"-"`
+	Poster        *User         `xorm:"-" json:"-"`
 	Text          string        `xorm:"notnull"`
-	FormattedText template.HTML `xorm:"-"`
+	FormattedText template.HTML `xorm:"-" json:"-"`
 	CreatedUnix   int64         `xorm:"created"`
-	Created       string        `xorm:"-"`
 	UpdatedUnix   int64         `xorm:"updated"`
 }
 
@@ -31,18 +43,6 @@ func (c *Comment) LoadPoster() (err error) {
 	}
 
 	c.Poster, err = GetUser(c.PosterID)
-	return
-}
-
-// LoadCreated loads the created time of a comment in a non-mapped field
-// relative to the current time.
-func (c *Comment) LoadCreated() (err error) {
-	if c == nil {
-		return nil
-	}
-
-	dur := time.Now().Sub(time.Unix(c.CreatedUnix, 0))
-	c.Created = durafmt.Parse(dur).LimitFirstN(1).String()
 	return
 }
 
@@ -74,5 +74,11 @@ func GetComment(id string) (*Comment, error) {
 // DeleteComment deletes a comment from the database.
 func DeleteComment(id string) (err error) {
 	_, err = engine.Id(id).Delete(&Comment{})
+	return
+}
+
+// GetAllUserComments returns all of the comments created by a specific user.
+func GetAllUserComments(user string) (c []Comment, err error) {
+	err = engine.Where("poster_id = ?", user).Find(&c)
 	return
 }

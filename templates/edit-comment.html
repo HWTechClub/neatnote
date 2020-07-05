@@ -1,17 +1,18 @@
 {{template "base/head" .}}
 <div class="content">
 	{{template "partials/flash" .}}
-	<h2>Edit your comment</h2>
+	<h2>Edit comment</h2>
 	<form method="post">
-		<div>
-			<textarea name="text" cols="40" rows="8"
+		<div class="col-5">
+		<div class="form-group">
+			<textarea class="form-item" name="text" cols="40" rows="8"
 				required="1">{{.Comment.Text}}</textarea>
 		</div>
-		<br />
 		<input type="hidden" name="_csrf" value="{{.csrf_token}}">
 		<p><button type="submit" class="btn">Submit changes</button>
 		<a class="btn btn-danger" href="/c/{{.Post.CourseCode}}/{{.Post.PostID}}">Discard
 		changes</a></p>
+		</div>
 	</form>
 </div>
 {{template "base/footer" .}}

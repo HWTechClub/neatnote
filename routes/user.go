@@ -1,3 +1,18 @@
+// Neat Note. A notes sharing platform for university students.
+// Copyright (C) 2020 Humaid AlQassimi
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 package routes
 
 import (
@@ -51,7 +66,7 @@ func PostProfileHandler(ctx *macaron.Context, sess session.Store, f *session.Fla
 		Badge:    badge,
 	}
 
-	err := models.UpdateUserBadge(u)
+	err := models.UpdateUserCols(u, "badge")
 	if err != nil {
 		panic(err)
 	}
@@ -65,18 +80,20 @@ func PostProfileHandler(ctx *macaron.Context, sess session.Store, f *session.Fla
 
 // PostDataHandler post response for requesting data (GDPR compliance).
 func PostDataHandler(ctx *macaron.Context, sess session.Store, f *session.Flash) {
-	u, err := models.GetUser(sess.Get("user").(string))
+	u, _ := models.GetUser(sess.Get("user").(string))
+	var p []models.Post
+	p, err := models.GetAllUserPosts(sess.Get("user").(string))
 	if err != nil {
 		panic(err)
 	}
-	var p []models.Post
-	p, err = models.GetAllUserPosts(sess.Get("user").(string))
+	c, err := models.GetAllUserComments(sess.Get("user").(string))
 	if err != nil {
 		panic(err)
 	}
 
 	ctx.JSON(200, map[string]interface{}{
-		"user":  u,
-		"posts": p,
+		"user":     u,
+		"posts":    p,
+		"comments": c,
 	})
 }

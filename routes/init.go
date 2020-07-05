@@ -1,3 +1,18 @@
+// Neat Note. A notes sharing platform for university students.
+// Copyright (C) 2020 Humaid AlQassimi
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 package routes
 
 import (
@@ -32,9 +47,7 @@ func ContextInit() macaron.Handler {
 				if user.Suspended {
 					ctx.Data["LoggedIn"] = 0
 					sess.Set("auth", LoggedOut)
-					f.Error("You have been logged as your account has been suspended.")
-					ctx.Redirect("/login")
-					return
+					f.Warning("You have been logged out as your account has been suspended.")
 				} else {
 					ctx.Data["User"] = user
 				}
