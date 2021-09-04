@@ -20,7 +20,7 @@ require (
 	golang.org/x/crypto v0.0.0-20200210222208-86ce3cb69678 // indirect
 	golang.org/x/net v0.0.0-20200202094626-16171245cfb2 // indirect
 	gopkg.in/ini.v1 v1.52.0 // indirect
-	gopkg.in/macaron.v1 v1.3.4
+	gopkg.in/macaron.v1 v1.3.7
 	xorm.io/core v0.7.3
 	xorm.io/xorm v0.8.1
 )
